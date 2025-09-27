@@ -99,6 +99,30 @@ export async function getDatabase() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
+        -- Secure file storage for encrypted file sharing
+        CREATE TABLE IF NOT EXISTS secure_files (
+          id VARCHAR(32) PRIMARY KEY,
+          contact_id INTEGER REFERENCES contacts(id),
+          original_filename VARCHAR(255) NOT NULL,
+          file_type VARCHAR(100),
+          file_size INTEGER,
+          salt VARCHAR(32) NOT NULL,
+          iv VARCHAR(32) NOT NULL,
+          auth_tag VARCHAR(32) NOT NULL,
+          description TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          expires_at TIMESTAMP NOT NULL
+        );
+
+        -- Access log for secure files
+        CREATE TABLE IF NOT EXISTS secure_file_access (
+          id SERIAL PRIMARY KEY,
+          file_id VARCHAR(32) REFERENCES secure_files(id),
+          accessed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          ip_address VARCHAR(45),
+          success BOOLEAN DEFAULT true
+        );
+
         -- Enhanced messages table
         CREATE TABLE IF NOT EXISTS messages (
           id SERIAL PRIMARY KEY,

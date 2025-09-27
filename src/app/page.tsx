@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Phone, MessageSquare, Users, Settings, Plus, Search, Send, PhoneCall, Calendar, Building2 } from 'lucide-react';
+import { Phone, MessageSquare, Users, Settings, Plus, Search, Send, PhoneCall, Calendar, Building2, Shield, Upload } from 'lucide-react';
 
 interface Contact {
   id: number;
@@ -46,6 +46,7 @@ export default function Home() {
   const [showNewContactForm, setShowNewContactForm] = useState(false);
   const [showSMSForm, setShowSMSForm] = useState(false);
   const [showCallForm, setShowCallForm] = useState(false);
+  const [showSecureUploadForm, setShowSecureUploadForm] = useState(false);
 
   const [newContact, setNewContact] = useState({
     name: '',
@@ -64,6 +65,13 @@ export default function Home() {
   const [callForm, setCallForm] = useState({
     to: '',
     contactName: ''
+  });
+
+  const [secureUploadForm, setSecureUploadForm] = useState({
+    file: null as File | null,
+    pin: '',
+    contactId: '',
+    description: ''
   });
 
   // Load data
@@ -172,6 +180,37 @@ export default function Home() {
     setLoading(false);
   };
 
+  const handleSecureUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!secureUploadForm.file || !secureUploadForm.pin) return;
+    
+    setLoading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', secureUploadForm.file);
+      formData.append('pin', secureUploadForm.pin);
+      formData.append('contactId', secureUploadForm.contactId);
+      formData.append('description', secureUploadForm.description);
+
+      const response = await fetch('/api/secure-upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        alert(`File uploaded successfully!\nShare this link: ${result.shareLink}\nAnd the PIN separately for security.`);
+        setShowSecureUploadForm(false);
+        setSecureUploadForm({ file: null, pin: '', contactId: '', description: '' });
+      }
+    } catch (error) {
+      console.error('Error uploading secure file:', error);
+    }
+    
+    setLoading(false);
+  };
+
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
@@ -217,6 +256,13 @@ export default function Home() {
               >
                 <PhoneCall className="h-4 w-4 mr-2" />
                 Call
+              </button>
+              <button 
+                onClick={() => setShowSecureUploadForm(true)}
+                className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2.5 rounded-xl flex items-center font-medium shadow-sm transition-all duration-200"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Secure Upload
               </button>
               <button 
                 onClick={handleLogout}
@@ -761,6 +807,98 @@ export default function Home() {
                 >
                   <PhoneCall className="h-4 w-4 mr-2" />
                   {loading ? 'Calling...' : 'Start Call'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Secure Upload Modal */}
+      {showSecureUploadForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-semibold mb-6 text-gray-900 flex items-center">
+              <Shield className="h-5 w-5 mr-2 text-purple-500" />
+              Secure File Upload
+            </h3>
+            <form onSubmit={handleSecureUpload} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Choose File</label>
+                <input
+                  type="file"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  onChange={(e) => setSecureUploadForm({...secureUploadForm, file: e.target.files?.[0] || null})}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Security PIN (4+ characters)</label>
+                <input
+                  type="password"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Enter secure PIN"
+                  value={secureUploadForm.pin}
+                  onChange={(e) => setSecureUploadForm({...secureUploadForm, pin: e.target.value})}
+                  required
+                  minLength={4}
+                />
+                <p className="text-xs text-gray-500 mt-1">Share this PIN separately for security</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Contact (Optional)</label>
+                <select
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  value={secureUploadForm.contactId}
+                  onChange={(e) => setSecureUploadForm({...secureUploadForm, contactId: e.target.value})}
+                >
+                  <option value="">Select contact</option>
+                  {contacts.map(contact => (
+                    <option key={contact.id} value={contact.id}>{contact.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="What is this file about?"
+                  rows={3}
+                  value={secureUploadForm.description}
+                  onChange={(e) => setSecureUploadForm({...secureUploadForm, description: e.target.value})}
+                />
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div className="flex items-start">
+                  <Shield className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-amber-700">
+                      File will be encrypted with AES-256. Share the download link and PIN separately for maximum security.
+                      Link expires in 7 days.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowSecureUploadForm(false)}
+                  className="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors duration-200 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading || !secureUploadForm.file || !secureUploadForm.pin}
+                  className="px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors duration-200 font-medium flex items-center disabled:opacity-50"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {loading ? 'Encrypting...' : 'Encrypt & Upload'}
                 </button>
               </div>
             </form>
