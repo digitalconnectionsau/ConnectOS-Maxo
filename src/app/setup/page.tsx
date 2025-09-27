@@ -23,14 +23,38 @@ interface CompanyData {
 }
 
 export default function SetupPage() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // Start at step 0 for database init
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [dbInitialized, setDbInitialized] = useState(false);
   const router = useRouter();
 
   const handleCompanySetup = (data: CompanyData) => {
     setCompanyData(data);
     setStep(2);
+  };
+
+  const handleInitializeDatabase = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/setup/init-database', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        setDbInitialized(true);
+        setStep(1); // Move to company setup
+      } else {
+        const error = await response.json();
+        alert(`Database initialization failed: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Database initialization error:', error);
+      alert('Database initialization failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateAccount = async (e: React.FormEvent) => {
@@ -78,6 +102,46 @@ export default function SetupPage() {
 
     setLoading(false);
   };
+
+  if (step === 0) {
+    // Database initialization step
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-600 relative overflow-hidden">
+        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl w-full max-w-md">
+            <div className="text-center mb-8">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center">
+                  <Building2 className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Initialize Database</h2>
+              <p className="text-gray-600">Set up your CRM database tables and create admin user</p>
+            </div>
+
+            <div className="mb-8">
+              <button
+                onClick={handleInitializeDatabase}
+                disabled={loading}
+                className="w-full bg-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Initializing Database...' : 'Initialize Database'}
+              </button>
+            </div>
+
+            <div className="text-sm text-gray-600">
+              <p>This will create:</p>
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Database tables for contacts, calls, messages</li>
+                <li>Default admin user (admin/admin123)</li>
+                <li>Essential system configuration</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (step === 1) {
     return <CompanySetup onComplete={handleCompanySetup} />;
