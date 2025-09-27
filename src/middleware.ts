@@ -3,9 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   // Public paths that don't require authentication
   const publicPaths = ['/login', '/api/auth/login', '/api/webhooks', '/setup', '/api/health', '/api/setup'];
+  
+  // Static file extensions that should be allowed
+  const staticFileExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico', '.css', '.js', '.woff', '.woff2', '.ttf', '.eot'];
+  const isStaticFile = staticFileExtensions.some(ext => request.nextUrl.pathname.toLowerCase().endsWith(ext));
+  
   const isPublicPath = publicPaths.some(path => request.nextUrl.pathname.startsWith(path));
 
-  if (isPublicPath) {
+  if (isPublicPath || isStaticFile) {
     return NextResponse.next();
   }
 
@@ -26,5 +31,15 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)']
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder files (images, etc.)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$).*)'
+  ]
 };
