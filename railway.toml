@@ -12,3 +12,8 @@ name = "phone-crm"
 
 [services.variables]
 NODE_ENV = "production"
+
+# Volume configuration for file storage
+[[volumes]]
+mountPath = "/data"
+name = "phone-crm-storage"

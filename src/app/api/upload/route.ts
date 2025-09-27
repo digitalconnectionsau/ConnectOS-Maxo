@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     // Use Railway volume path if available, otherwise use temp directory
     const uploadDir = process.env.NODE_ENV === 'production' 
-      ? '/app/storage/uploads' // Railway volume mount path
+      ? '/data/uploads' // Railway volume mount path
       : join(process.cwd(), 'uploads');
 
     // Create directory if it doesn't exist

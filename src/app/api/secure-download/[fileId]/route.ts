@@ -32,7 +32,7 @@ export async function POST(
     
     // Read encrypted file
     const uploadDir = process.env.NODE_ENV === 'production' 
-      ? '/app/storage/secure-files'
+      ? '/data/secure-files'
       : join(process.cwd(), 'secure-files');
     
     const encryptedFilePath = join(uploadDir, `${fileId}.enc`);

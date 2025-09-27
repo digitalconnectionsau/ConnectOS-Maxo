@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     
     // Storage directory
     const uploadDir = process.env.NODE_ENV === 'production' 
-      ? '/app/storage/secure-files'
+      ? '/data/secure-files'
       : join(process.cwd(), 'secure-files');
 
     await mkdir(uploadDir, { recursive: true });
