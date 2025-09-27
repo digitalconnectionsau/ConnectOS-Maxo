@@ -14,9 +14,18 @@ export async function POST(request: NextRequest) {
 
     console.log('Testing call to:', to);
     console.log('Twilio env vars:', {
-      accountSid: process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Missing',
-      authToken: process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Missing',
+      accountSid: process.env.TWILIO_ACCOUNT_SID ? `Set (${process.env.TWILIO_ACCOUNT_SID.substring(0, 10)}...)` : 'Missing',
+      authToken: process.env.TWILIO_AUTH_TOKEN ? `Set (${process.env.TWILIO_AUTH_TOKEN.substring(0, 10)}...)` : 'Missing',
       phoneNumber: process.env.TWILIO_PHONE_NUMBER || 'Missing'
+    });
+
+    return NextResponse.json({
+      debug: 'Environment check',
+      twilio: {
+        accountSid: process.env.TWILIO_ACCOUNT_SID ? `Set (${process.env.TWILIO_ACCOUNT_SID.substring(0, 10)}...)` : 'Missing',
+        authToken: process.env.TWILIO_AUTH_TOKEN ? `Set (${process.env.TWILIO_AUTH_TOKEN.substring(0, 10)}...)` : 'Missing',
+        phoneNumber: process.env.TWILIO_PHONE_NUMBER || 'Missing'
+      }
     });
 
     // Create TwiML URL for the call
