@@ -41,6 +41,7 @@ export default function Home() {
   const [calls, setCalls] = useState<Call[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Form states
   const [showNewContactForm, setShowNewContactForm] = useState(false);
@@ -79,7 +80,20 @@ export default function Home() {
     loadContacts();
     loadCalls();
     loadMessages();
+    loadCurrentUser();
   }, []);
+
+  const loadCurrentUser = async () => {
+    try {
+      const response = await fetch('/api/auth/me');
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentUser(data.user);
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+    }
+  };
 
   const loadContacts = async () => {
     try {
@@ -232,7 +246,9 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Phone CRM</h1>
-                <p className="text-sm text-gray-500">Business Communication Platform</p>
+                <p className="text-sm text-gray-500">
+                  {currentUser ? `Welcome back, ${currentUser.full_name || currentUser.username}` : 'Business Communication Platform'}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-3">

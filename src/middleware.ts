@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
   // Public paths that don't require authentication
-  const publicPaths = ['/login', '/api/auth/login', '/api/webhooks'];
+  const publicPaths = ['/login', '/api/auth/login', '/api/webhooks', '/setup'];
   const isPublicPath = publicPaths.some(path => request.nextUrl.pathname.startsWith(path));
 
   if (isPublicPath) {
@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
 
   // Check for authentication cookie
   const sessionCookie = request.cookies.get('crm-session');
-  const isAuthenticated = sessionCookie?.value === 'authenticated';
+  const isAuthenticated = sessionCookie?.value?.startsWith('user-');
 
   if (!isAuthenticated) {
     // Redirect to login page for web requests

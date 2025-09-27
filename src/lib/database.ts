@@ -16,6 +16,20 @@ export async function getDatabase() {
     const client = await pool.connect();
     try {
       await client.query(`
+        -- Users/Admin table for authentication
+        CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          username VARCHAR(100) UNIQUE NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password_hash VARCHAR(255) NOT NULL,
+          full_name VARCHAR(255),
+          role VARCHAR(50) DEFAULT 'admin', -- 'admin', 'user', 'manager'
+          is_active BOOLEAN DEFAULT true,
+          last_login TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         -- Companies/Organizations
         CREATE TABLE IF NOT EXISTS companies (
           id SERIAL PRIMARY KEY,

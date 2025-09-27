@@ -1,18 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticateUser } from '@/lib/users';
 
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();
 
-    // Simple authentication - you can make this more secure
-    const validUsername = process.env.ADMIN_USERNAME || 'admin';
-    const validPassword = process.env.ADMIN_PASSWORD || 'password123';
+    if (!username || !password) {
+      return NextResponse.json({ error: 'Username and password are required' }, { status: 400 });
+    }
 
-    if (username === validUsername && password === validPassword) {
-      const response = NextResponse.json({ success: true });
+    const user = await authenticateUser(username, password);
+
+    if (user) {
+      const response = NextResponse.json({ 
+        success: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          full_name: user.full_name,
+          role: user.role
+        }
+      });
       
-      // Set a secure session cookie
-      response.cookies.set('crm-session', 'authenticated', {
+      // Set a secure session cookie with user ID
+      response.cookies.set('crm-session', `user-${user.id}`, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
