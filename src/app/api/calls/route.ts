@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const db = await getDatabase();
     
-    const calls = await db.all(`
+    const result = await db.query(`
       SELECT c.*, contacts.name as contact_name 
       FROM calls c
       LEFT JOIN contacts ON c.contact_id = contacts.id
@@ -13,7 +13,7 @@ export async function GET() {
       LIMIT 50
     `);
 
-    return NextResponse.json(calls);
+    return NextResponse.json(result.rows);
   } catch (error) {
     console.error('Error fetching calls:', error);
     return NextResponse.json(

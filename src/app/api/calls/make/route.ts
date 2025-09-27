@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
     const db = await getDatabase();
     const contact = await findOrCreateContact(to, contactName);
 
-    await db.run(
+    await db.query(
       `INSERT INTO calls (contact_id, twilio_sid, direction, from_number, to_number, status)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         contact?.id || null,
         call.sid,

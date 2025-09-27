@@ -15,9 +15,11 @@ export async function POST(request: NextRequest) {
     const db = await getDatabase();
     const contact = await findOrCreateContact(from);
 
-    await db.run(
-      `INSERT OR REPLACE INTO calls (twilio_sid, contact_id, direction, from_number, to_number, status, duration)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    await db.query(
+      `INSERT INTO calls (twilio_sid, contact_id, direction, from_number, to_number, status, duration)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (twilio_sid) 
+       DO UPDATE SET status = $6, duration = $7, contact_id = COALESCE(calls.contact_id, $2)`,
       [
         callSid,
         contact?.id || null,
