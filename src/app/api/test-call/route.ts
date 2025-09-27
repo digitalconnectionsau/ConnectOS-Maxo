@@ -19,14 +19,24 @@ export async function POST(request: NextRequest) {
       phoneNumber: process.env.TWILIO_PHONE_NUMBER || 'Missing'
     });
 
-    return NextResponse.json({
-      debug: 'Environment check',
-      twilio: {
-        accountSid: process.env.TWILIO_ACCOUNT_SID ? `Set (${process.env.TWILIO_ACCOUNT_SID.substring(0, 10)}...)` : 'Missing',
-        authToken: process.env.TWILIO_AUTH_TOKEN ? `Set (${process.env.TWILIO_AUTH_TOKEN.substring(0, 10)}...)` : 'Missing',
-        phoneNumber: process.env.TWILIO_PHONE_NUMBER || 'Missing'
-      }
+    // Test Twilio client initialization
+    const { twilioClient, TWILIO_PHONE_NUMBER } = await import('@/lib/twilio');
+    
+    console.log('Twilio client status:', {
+      client: twilioClient ? 'Initialized' : 'Null',
+      phoneNumber: TWILIO_PHONE_NUMBER
     });
+
+    if (!twilioClient) {
+      return NextResponse.json({
+        error: 'Twilio client not initialized',
+        envVars: {
+          accountSid: process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Missing',
+          authToken: process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Missing',
+          phoneNumber: process.env.TWILIO_PHONE_NUMBER || 'Missing'
+        }
+      }, { status: 500 });
+    }
 
     // Create TwiML URL for the call
     const twimlUrl = `${request.nextUrl.origin}/api/twiml/call`;
