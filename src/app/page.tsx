@@ -172,6 +172,15 @@ export default function Home() {
     setLoading(false);
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -208,6 +217,12 @@ export default function Home() {
               >
                 <PhoneCall className="h-4 w-4 mr-2" />
                 Call
+              </button>
+              <button 
+                onClick={handleLogout}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2.5 rounded-xl flex items-center font-medium shadow-sm transition-all duration-200"
+              >
+                Logout
               </button>
             </div>
           </div>
