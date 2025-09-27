@@ -38,8 +38,11 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Create TwiML URL for the call
-    const twimlUrl = `${request.nextUrl.origin}/api/twiml/call`;
+    // Create TwiML URL for the call - use Railway domain in production
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://digital-connections-crm-production.up.railway.app'
+      : request.nextUrl.origin;
+    const twimlUrl = `${baseUrl}/api/twiml/call`;
     console.log('TwiML URL:', twimlUrl);
 
     // Make the call via Twilio
