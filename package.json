@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@twilio/voice-sdk": "^2.16.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/pg": "^8.15.5",
     "bcryptjs": "^3.0.2",

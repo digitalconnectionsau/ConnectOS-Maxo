@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Phone, MessageSquare, Users, Settings, Plus, Search, Send, PhoneCall, Calendar, Building2, Shield, Upload } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Phone, MessageSquare, Users, Plus, Search, Send, PhoneCall, Calendar, Building2, Shield, Upload } from 'lucide-react';
+import PhoneInterface from '@/components/PhoneInterface';
+import { twilioCallManager } from '@/lib/twilioCall';
 
 interface Contact {
   id: number;
@@ -41,7 +43,13 @@ export default function Home() {
   const [calls, setCalls] = useState<Call[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    id: number;
+    username: string;
+    email: string;
+    full_name: string | null;
+    role: string;
+  } | null>(null);
 
   // Form states
   const [showNewContactForm, setShowNewContactForm] = useState(false);
@@ -82,6 +90,55 @@ export default function Home() {
     loadMessages();
     loadCurrentUser();
   }, []);
+
+  const initializeTwilioDevice = useCallback(async () => {
+    try {
+      const response = await fetch('/api/twilio/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser?.id })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        await twilioCallManager.initialize(data.accessToken);
+      }
+    } catch (error) {
+      console.error('Failed to initialize Twilio device:', error);
+    }
+  }, [currentUser?.id]);
+
+  // Initialize Twilio after user is loaded
+  useEffect(() => {
+    if (currentUser?.id) {
+      initializeTwilioDevice();
+    }
+  }, [currentUser, initializeTwilioDevice]);
+
+  // Phone interface handlers
+  const handlePhoneMakeCall = async (phoneNumber: string) => {
+    try {
+      await twilioCallManager.makeCall(phoneNumber);
+    } catch (error) {
+      console.error('Failed to make call:', error);
+    }
+  };
+
+  const handlePhoneEndCall = () => {
+    twilioCallManager.endCall();
+  };
+
+  const handlePhoneAnswerCall = () => {
+    twilioCallManager.answerCall();
+  };
+
+  const handlePhoneToggleMute = () => {
+    twilioCallManager.toggleMute();
+  };
+
+  const handlePhoneToggleHold = () => {
+    twilioCallManager.toggleHold();
+  };
 
   const loadCurrentUser = async () => {
     try {
@@ -921,6 +978,15 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Phone Interface */}
+      <PhoneInterface
+        onMakeCall={handlePhoneMakeCall}
+        onEndCall={handlePhoneEndCall}
+        onAnswerCall={handlePhoneAnswerCall}
+        onToggleMute={handlePhoneToggleMute}
+        onToggleHold={handlePhoneToggleHold}
+      />
     </div>
   );
 }

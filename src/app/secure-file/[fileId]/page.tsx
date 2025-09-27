@@ -12,7 +12,10 @@ export default function SecureFilePage() {
   const [showPin, setShowPin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [fileInfo, setFileInfo] = useState<any>(null);
+  const [fileInfo, setFileInfo] = useState<{
+    filename?: string;
+    downloaded?: boolean;
+  } | null>(null);
 
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +53,7 @@ export default function SecureFilePage() {
         const data = await response.json();
         setError(data.error || 'Download failed');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.');
     }
 
@@ -151,7 +154,7 @@ export default function SecureFilePage() {
             </div>
             <h3 className="text-lg font-medium text-green-900 mb-2">Download Complete</h3>
             <p className="text-green-700 text-sm">
-              The file "{fileInfo.filename}" has been successfully decrypted and downloaded.
+              The file &quot;{fileInfo.filename}&quot; has been successfully decrypted and downloaded.
             </p>
           </div>
         )}

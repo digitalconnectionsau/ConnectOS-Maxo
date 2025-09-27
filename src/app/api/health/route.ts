@@ -9,7 +9,7 @@ export async function GET() {
       service: 'phone-crm',
       version: '1.0.0'
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { status: 'unhealthy', error: 'Service unavailable' },
       { status: 500 }

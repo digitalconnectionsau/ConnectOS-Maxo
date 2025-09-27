@@ -137,6 +137,47 @@ export async function getDatabase() {
           success BOOLEAN DEFAULT true
         );
 
+        -- SIP devices table for mobile integration
+        CREATE TABLE IF NOT EXISTS sip_devices (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          device_id VARCHAR(255) NOT NULL,
+          device_type VARCHAR(50) DEFAULT 'mobile',
+          sip_username VARCHAR(255),
+          sip_password VARCHAR(255),
+          registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          last_seen TIMESTAMP,
+          UNIQUE(user_id, device_id)
+        );
+
+        -- Yealink devices table
+        CREATE TABLE IF NOT EXISTS yealink_devices (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          mac_address VARCHAR(17) UNIQUE NOT NULL,
+          model VARCHAR(100),
+          firmware_version VARCHAR(100),
+          display_name VARCHAR(255),
+          sip_username VARCHAR(255),
+          sip_password VARCHAR(255),
+          extension VARCHAR(20),
+          timezone VARCHAR(10) DEFAULT '+00',
+          provisioned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          last_provisioned TIMESTAMP,
+          status VARCHAR(20) DEFAULT 'active'
+        );
+
+        -- Device presence table for BLF
+        CREATE TABLE IF NOT EXISTS device_presence (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          extension VARCHAR(20) NOT NULL,
+          status VARCHAR(20) DEFAULT 'available',
+          status_message TEXT,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_id, extension)
+        );
+
         -- Enhanced messages table
         CREATE TABLE IF NOT EXISTS messages (
           id SERIAL PRIMARY KEY,

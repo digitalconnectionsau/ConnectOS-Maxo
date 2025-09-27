@@ -1,10 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, Mail, Phone, MapPin, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { MapPin, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+
+interface CompanyData {
+  companyName: string;
+  email: string;
+  phone: string;
+  industry: string;
+  size: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  adminName: string;
+  adminEmail: string;
+  adminPhone: string;
+  password: string;
+  confirmPassword: string;
+}
 
 interface CompanySetupProps {
-  onComplete: (companyData: any) => void;
+  onComplete: (companyData: CompanyData) => void;
 }
 
 export default function CompanySetup({ onComplete }: CompanySetupProps) {
@@ -293,7 +310,7 @@ export default function CompanySetup({ onComplete }: CompanySetupProps) {
             </div>
 
             <div className="mt-8 p-6 bg-gradient-to-r from-teal-50 to-blue-50 rounded-xl border border-teal-100">
-              <h3 className="font-semibold text-gray-900 mb-2">What you'll get:</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">What you&apos;ll get:</h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
                   <Check className="h-4 w-4 text-teal-500 mr-2" />

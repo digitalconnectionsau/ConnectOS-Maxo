@@ -2,22 +2,41 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Building2, Shield, Check } from 'lucide-react';
+import { Building2, Check } from 'lucide-react';
 import CompanySetup from '@/components/CompanySetup';
+
+interface CompanyData {
+  companyName: string;
+  email: string;
+  phone: string;
+  industry: string;
+  size: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  adminName: string;
+  adminEmail: string;
+  adminPhone: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function SetupPage() {
   const [step, setStep] = useState(1);
-  const [companyData, setCompanyData] = useState<any>(null);
+  const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleCompanySetup = (data: any) => {
+  const handleCompanySetup = (data: CompanyData) => {
     setCompanyData(data);
     setStep(2);
   };
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!companyData) return;
+    
     setLoading(true);
 
     try {
@@ -35,9 +54,7 @@ export default function SetupPage() {
         }),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        
+      if (response.ok) {        
         // Auto-login after account creation
         const loginResponse = await fetch('/api/auth/login', {
           method: 'POST',
@@ -55,7 +72,7 @@ export default function SetupPage() {
         const error = await response.json();
         alert(error.error || 'Setup failed');
       }
-    } catch (error) {
+    } catch {
       alert('Setup failed. Please try again.');
     }
 
@@ -137,7 +154,7 @@ export default function SetupPage() {
 
           <div className="text-center mt-6">
             <p className="text-xs text-gray-500">
-              You'll be automatically logged in after setup
+              You&apos;ll be automatically logged in after setup
             </p>
           </div>
         </div>

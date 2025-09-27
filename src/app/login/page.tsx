@@ -18,7 +18,7 @@ export default function LoginPage() {
           // Already authenticated, redirect to main app
           window.location.href = '/';
         }
-      } catch (error) {
+      } catch {
         // Not authenticated, stay on login page
       }
     };
@@ -43,7 +43,7 @@ export default function LoginPage() {
         const data = await response.json();
         setError(data.error || 'Login failed');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.');
     }
 

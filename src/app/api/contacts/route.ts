@@ -29,7 +29,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, phone, email, notes, jobTitle, company } = await request.json();
+    const { name, phone, email, notes, jobTitle } = await request.json();
 
     if (!name || !phone) {
       return NextResponse.json(

@@ -6,11 +6,12 @@ import { getDatabase } from '@/lib/database';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const { pin } = await request.json();
-    const fileId = params.fileId;
+    const resolvedParams = await params;
+    const fileId = resolvedParams.fileId;
 
     if (!pin) {
       return NextResponse.json({ error: 'PIN is required' }, { status: 400 });
@@ -67,7 +68,7 @@ export async function POST(
         },
       });
 
-    } catch (decryptError) {
+    } catch {
       // Log failed attempt
       await db.query(
         'INSERT INTO secure_file_access (file_id, accessed_at, ip_address, success) VALUES ($1, $2, $3, $4)',
