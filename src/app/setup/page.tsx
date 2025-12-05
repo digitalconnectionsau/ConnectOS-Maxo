@@ -34,7 +34,7 @@ export default function SetupPage() {
   };
 
   const handleInitializeDatabase = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const response = await fetch('/api/setup/init-database', {
         method: 'POST',
@@ -42,7 +42,7 @@ export default function SetupPage() {
       });
 
       if (response.ok) {
-        setDbInitialized(true);
+        alert('Database initialized successfully!');
         setStep(1); // Move to company setup
       } else {
         const error = await response.json();
@@ -52,7 +52,7 @@ export default function SetupPage() {
       console.error('Database initialization error:', error);
       alert('Database initialization failed. Please try again.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
