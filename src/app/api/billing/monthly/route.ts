@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint to check billing status
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const db = await getDatabase();
     const currentMonth = new Date();

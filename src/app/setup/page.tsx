@@ -25,8 +25,7 @@ interface CompanyData {
 export default function SetupPage() {
   const [step, setStep] = useState(0); // Start at step 0 for database init
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [dbInitialized, setDbInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleCompanySetup = (data: CompanyData) => {

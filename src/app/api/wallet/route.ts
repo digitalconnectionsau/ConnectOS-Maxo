@@ -3,7 +3,7 @@ import { getDatabase } from '@/lib/database';
 import { stripe, createOrGetStripeCustomer, createOrGetWallet, dollarsToCents, formatCurrency } from '@/lib/stripe';
 
 // GET - Get wallet balance and recent transactions
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // TODO: Get user ID from authentication/session
     const userId = 1; // Hardcoded for now - replace with actual auth
