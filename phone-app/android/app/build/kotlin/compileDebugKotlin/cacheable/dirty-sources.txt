@@ -1,5 +1,0 @@
-/Users/craigparker/Development/projects/phone-system/phone-app/android/app/src/main/java/com/digitalconnections/phonesystem/viewmodel/DialerViewModel.kt
-/Users/craigparker/Development/projects/phone-system/phone-app/android/app/src/main/java/com/digitalconnections/phonesystem/SettingsActivity.kt
-/Users/craigparker/Development/projects/phone-system/phone-app/android/app/src/main/java/com/digitalconnections/phonesystem/viewmodel/CallViewModel.kt
-/Users/craigparker/Development/projects/phone-system/phone-app/android/app/src/main/java/com/digitalconnections/phonesystem/utils/SettingsManager.kt
-/Users/craigparker/Development/projects/phone-system/phone-app/android/app/src/main/java/com/digitalconnections/phonesystem/MainActivity.kt
