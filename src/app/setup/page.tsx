@@ -60,7 +60,7 @@ export default function SetupPage() {
     e.preventDefault();
     if (!companyData) return;
     
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       // Create the admin user
@@ -99,7 +99,7 @@ export default function SetupPage() {
       alert('Setup failed. Please try again.');
     }
 
-    setLoading(false);
+    setIsLoading(false);
   };
 
   if (step === 0) {
@@ -121,10 +121,10 @@ export default function SetupPage() {
             <div className="mb-8">
               <button
                 onClick={handleInitializeDatabase}
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full bg-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Initializing Database...' : 'Initialize Database'}
+                {isLoading ? 'Initializing Database...' : 'Initialize Database'}
               </button>
             </div>
 
@@ -199,10 +199,10 @@ export default function SetupPage() {
 
           <button
             onClick={handleCreateAccount}
-            disabled={loading}
+            disabled={isLoading}
             className="w-full py-3 px-4 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors duration-200 font-medium flex items-center justify-center disabled:opacity-50"
           >
-            {loading ? (
+            {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
                 Setting up...

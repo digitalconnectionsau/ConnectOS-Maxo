@@ -42,6 +42,7 @@ export default function NewContactModal({ isOpen, onClose, onSubmit, loading }: 
       phone: formData.phone,
       email: formData.email,
       jobTitle: formData.jobTitle,
+      company: formData.company || '',
       notes: formData.notes
     });
     
