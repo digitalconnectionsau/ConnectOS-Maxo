@@ -257,6 +257,55 @@ export async function getDatabase() {
         );
 
         -- Performance indexes
+        -- Stripe customer management
+        CREATE TABLE IF NOT EXISTS stripe_customers (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          stripe_customer_id VARCHAR(255) UNIQUE NOT NULL,
+          email VARCHAR(255) NOT NULL,
+          name VARCHAR(255),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Wallet/prepaid balance system
+        CREATE TABLE IF NOT EXISTS wallets (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+          balance DECIMAL(10,2) DEFAULT 0.00,
+          currency VARCHAR(3) DEFAULT 'USD',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Transaction history for wallet
+        CREATE TABLE IF NOT EXISTS wallet_transactions (
+          id SERIAL PRIMARY KEY,
+          wallet_id INTEGER REFERENCES wallets(id) ON DELETE CASCADE,
+          stripe_payment_intent_id VARCHAR(255),
+          type VARCHAR(50) NOT NULL, -- 'credit', 'debit', 'refund'
+          amount DECIMAL(10,2) NOT NULL,
+          description TEXT,
+          reference_type VARCHAR(50), -- 'call', 'sms', 'fax', 'email', 'top_up', 'monthly_deduction'
+          reference_id INTEGER, -- ID of the call, message, etc.
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Monthly billing records
+        CREATE TABLE IF NOT EXISTS monthly_billings (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          billing_period DATE NOT NULL, -- First day of the month
+          total_calls INTEGER DEFAULT 0,
+          total_sms INTEGER DEFAULT 0,
+          total_emails INTEGER DEFAULT 0,
+          total_faxes INTEGER DEFAULT 0,
+          total_amount DECIMAL(10,2) DEFAULT 0.00,
+          status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'processed', 'failed'
+          processed_at TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE INDEX IF NOT EXISTS idx_contacts_phone ON contacts(phone);
         CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
         CREATE INDEX IF NOT EXISTS idx_contacts_company ON contacts(company_id);
@@ -270,6 +319,13 @@ export async function getDatabase() {
         CREATE INDEX IF NOT EXISTS idx_invoices_due_date ON invoices(due_date);
         CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
         CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
+        CREATE INDEX IF NOT EXISTS idx_stripe_customers_user_id ON stripe_customers(user_id);
+        CREATE INDEX IF NOT EXISTS idx_stripe_customers_stripe_id ON stripe_customers(stripe_customer_id);
+        CREATE INDEX IF NOT EXISTS idx_wallets_user_id ON wallets(user_id);
+        CREATE INDEX IF NOT EXISTS idx_wallet_transactions_wallet_id ON wallet_transactions(wallet_id);
+        CREATE INDEX IF NOT EXISTS idx_wallet_transactions_type ON wallet_transactions(type);
+        CREATE INDEX IF NOT EXISTS idx_monthly_billings_user_id ON monthly_billings(user_id);
+        CREATE INDEX IF NOT EXISTS idx_monthly_billings_period ON monthly_billings(billing_period);
       `);
       
       console.log('PostgreSQL database initialized successfully with full CRM + payments schema');

@@ -1,0 +1,173 @@
+package com.digitalconnections.phonesystem
+
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.digitalconnections.phonesystem.databinding.ActivitySettingsBinding
+import com.digitalconnections.phonesystem.utils.SettingsManager
+
+class SettingsActivity : AppCompatActivity() {
+    
+    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var settingsManager: SettingsManager
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        settingsManager = SettingsManager(this)
+        
+        setupToolbar()
+        setupProviderSpinner()
+        loadSettings()
+        setupListeners()
+    }
+    
+    private fun setupToolbar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            title = "Settings"
+            setDisplayHomeAsUpEnabled(true)
+        }
+    }
+    
+    private fun setupProviderSpinner() {
+        val providers = arrayOf("Twilio", "MaxoTel PBX")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, providers)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerProvider.adapter = adapter
+    }
+    
+    private fun loadSettings() {
+        // Load provider type
+        val providerType = settingsManager.getProviderType()
+        binding.spinnerProvider.setSelection(if (providerType == "twilio") 0 else 1)
+        
+        // Load Twilio settings
+        binding.etTwilioAccountSid.setText(settingsManager.getTwilioAccountSid())
+        binding.etTwilioApiKey.setText(settingsManager.getTwilioApiKey())
+        binding.etTwilioApiSecret.setText(settingsManager.getTwilioApiSecret())
+        binding.etTwilioFromNumber.setText(settingsManager.getTwilioFromNumber())
+        
+        // Load MaxoTel settings
+        binding.etMaxotelServer.setText(settingsManager.getMaxotelServer())
+        binding.etMaxotelPort.setText(settingsManager.getMaxotelPort().toString())
+        binding.etMaxotelUsername.setText(settingsManager.getMaxotelUsername())
+        binding.etMaxotelPassword.setText(settingsManager.getMaxotelPassword())
+        binding.etMaxotelExtension.setText(settingsManager.getMaxotelExtension())
+        
+        // Load general settings
+        binding.switchAutoAnswer.isChecked = settingsManager.isAutoAnswerEnabled()
+        binding.switchSpeaker.isChecked = settingsManager.isSpeakerEnabled()
+        binding.switchNotifications.isChecked = settingsManager.areNotificationsEnabled()
+        
+        updateProviderVisibility()
+    }
+    
+    private fun setupListeners() {
+        binding.spinnerProvider.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                updateProviderVisibility()
+            }
+            
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        })
+        
+        binding.btnSave.setOnClickListener {
+            saveSettings()
+        }
+        
+        binding.btnTestConnection.setOnClickListener {
+            testConnection()
+        }
+    }
+    
+    private fun updateProviderVisibility() {
+        val selectedProvider = binding.spinnerProvider.selectedItemPosition
+        
+        if (selectedProvider == 0) { // Twilio
+            binding.twilioSettingsGroup.visibility = android.view.View.VISIBLE
+            binding.maxotelSettingsGroup.visibility = android.view.View.GONE
+        } else { // MaxoTel
+            binding.twilioSettingsGroup.visibility = android.view.View.GONE
+            binding.maxotelSettingsGroup.visibility = android.view.View.VISIBLE
+        }
+    }
+    
+    private fun saveSettings() {
+        try {
+            // Save provider type
+            val providerType = if (binding.spinnerProvider.selectedItemPosition == 0) "twilio" else "maxotel"
+            settingsManager.setProviderType(providerType)
+            
+            if (providerType == "twilio") {
+                // Save Twilio settings
+                settingsManager.setTwilioAccountSid(binding.etTwilioAccountSid.text.toString().trim())
+                settingsManager.setTwilioApiKey(binding.etTwilioApiKey.text.toString().trim())
+                settingsManager.setTwilioApiSecret(binding.etTwilioApiSecret.text.toString().trim())
+                settingsManager.setTwilioFromNumber(binding.etTwilioFromNumber.text.toString().trim())
+                
+                // Validate Twilio settings
+                if (!settingsManager.isTwilioConfigured()) {
+                    Toast.makeText(this, "Please fill in all Twilio settings", Toast.LENGTH_LONG).show()
+                    return
+                }
+            } else {
+                // Save MaxoTel settings
+                settingsManager.setMaxotelServer(binding.etMaxotelServer.text.toString().trim())
+                settingsManager.setMaxotelUsername(binding.etMaxotelUsername.text.toString().trim())
+                settingsManager.setMaxotelPassword(binding.etMaxotelPassword.text.toString().trim())
+                settingsManager.setMaxotelExtension(binding.etMaxotelExtension.text.toString().trim())
+                
+                val port = binding.etMaxotelPort.text.toString().trim()
+                if (port.isNotEmpty()) {
+                    settingsManager.setMaxotelPort(port.toIntOrNull() ?: 5060)
+                }
+                
+                // Validate MaxoTel settings
+                if (!settingsManager.isMaxotelConfigured()) {
+                    Toast.makeText(this, "Please fill in all MaxoTel settings", Toast.LENGTH_LONG).show()
+                    return
+                }
+            }
+            
+            // Save general settings
+            settingsManager.setAutoAnswerEnabled(binding.switchAutoAnswer.isChecked)
+            settingsManager.setSpeakerEnabled(binding.switchSpeaker.isChecked)
+            settingsManager.setNotificationsEnabled(binding.switchNotifications.isChecked)
+            
+            Toast.makeText(this, "Settings saved successfully", Toast.LENGTH_SHORT).show()
+            
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error saving settings: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+    
+    private fun testConnection() {
+        val providerType = settingsManager.getProviderType()
+        
+        binding.btnTestConnection.isEnabled = false
+        binding.btnTestConnection.text = "Testing..."
+        
+        // Simulate connection test
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            val isConfigured = settingsManager.isCurrentProviderConfigured()
+            
+            if (isConfigured) {
+                Toast.makeText(this, "$providerType configuration appears valid", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please configure $providerType settings first", Toast.LENGTH_LONG).show()
+            }
+            
+            binding.btnTestConnection.isEnabled = true
+            binding.btnTestConnection.text = "Test Connection"
+        }, 2000)
+    }
+    
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+}

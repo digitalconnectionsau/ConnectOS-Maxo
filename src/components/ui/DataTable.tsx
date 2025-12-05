@@ -124,12 +124,12 @@ export default function DataTable({
     <div>
       {/* Page Header */}
       {header && (
-        <div>
+        <div className="mb-6">
           {header}
         </div>
       )}
       
-      <div className="bg-white rounded-b-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className={`bg-white shadow-sm border border-gray-200 overflow-hidden ${header ? 'rounded-xl' : 'rounded-b-xl'}`}>
         {/* Table Header */}
         <div className="bg-gradient-to-r from-[#E5F5F2] to-[#F0F9F6] px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">

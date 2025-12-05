@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Building2, Users, Phone, MessageSquare, Menu, X, Mail, Printer, FolderOpen, Settings } from 'lucide-react';
+import { Building2, Users, Phone, MessageSquare, Menu, X, Mail, Printer, FolderOpen, Settings, UserCircle } from 'lucide-react';
 
 interface SidebarProps {
   contactsCount?: number;
@@ -74,6 +74,13 @@ export default function Sidebar({
       icon: FolderOpen,
       count: fileTransferCount,
       path: '/file-transfer'
+    },
+    {
+      id: 'account',
+      label: 'Account',
+      icon: UserCircle,
+      count: null,
+      path: '/account'
     },
     {
       id: 'settings',

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.PhoneSystem" parent="Theme.Material3.DayNight">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+    </style>
+
+    <!-- Dialer Button Style -->
+    <style name="DialerButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="strokeColor">@color/primary</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
+
+    <!-- Call Button Style -->
+    <style name="CallButton" parent="Widget.Material3.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">28dp</item>
+    </style>
+
+    <!-- Settings Group Style -->
+    <style name="SettingsGroup">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">@drawable/settings_group_background</item>
+    </style>
+
+    <!-- Settings Input Style -->
+    <style name="SettingsInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+    </style>
+</resources>

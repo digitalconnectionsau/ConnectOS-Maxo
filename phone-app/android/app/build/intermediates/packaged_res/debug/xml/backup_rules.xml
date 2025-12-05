@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude sensitive credential files from backup -->
+    <exclude domain="sharedpref" path="phone_system_prefs.xml"/>
+    <exclude domain="database" />
+    
+    <!-- Include app preferences for user experience -->
+    <include domain="sharedpref" path="settings.xml"/>
+</full-backup-content>

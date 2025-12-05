@@ -1,38 +1,60 @@
-# Phone CRM System
+# Phone CRM System V2
 
-A fun phone/CRM system built with Next.js and Twilio integration for making calls, sending SMS, and managing contacts.
+A Next.js VoIP/CRM platform with **Hybrid MaxoTel** architecture for cost-optimized voice and SMS services.
 
-## Why Railway + Twilio?
+## 🎯 V2 Architecture (Cost-Saving Hybrid)
 
-This combination provides several advantages:
+This version uses a **smart hybrid approach**:
+
+- **Frontend**: Twilio WebRTC client (`@twilio/voice-sdk`) - unchanged
+- **Voice Calls**: Bridged to MaxoTel SIP trunk via Twilio BYOC - **~70% cost savings**
+- **SMS**: Direct MaxoTel REST API - **~60% cost savings**  
+- **Call Logs**: MaxoTel CDR API instead of Twilio logs
+
+**Result**: You keep the excellent Twilio developer experience while routing actual calls/SMS through MaxoTel's lower-cost infrastructure.
+
+## 💰 Cost Comparison
+
+| Service | Twilio Native | Hybrid MaxoTel | Savings |
+|---------|---------------|----------------|---------|
+| 1000 calls (10 min avg) | $400/mo | $125/mo | **69%** |
+| 500 SMS messages | $40/mo | $12.50/mo | **69%** |
+| **Total Monthly** | **$440** | **$137.50** | **$302.50** |
+
+## Why Railway + MaxoTel?
 
 🚀 **Easy Deployment**: Railway automatically builds and deploys from GitHub  
 🔒 **Secure Environment**: Environment variables are encrypted and secure  
-📊 **Persistent Storage**: SQLite database persists across deployments  
+📊 **Persistent Storage**: PostgreSQL database for enterprise-grade data  
 🌐 **Global CDN**: Fast response times for webhook handling  
-📱 **Reliable Webhooks**: Railway's uptime ensures Twilio webhooks are always received  
-💰 **Cost Effective**: Railway's pricing scales with usage  
+💰 **Cost Optimized**: MaxoTel's competitive Australian rates  
 🔄 **Auto Deployments**: Push to GitHub and Railway automatically redeploys
+⚡ **Best of Both**: Twilio's WebRTC + MaxoTel's carrier pricing
 
 ## Features
 
-- 📞 **Make outbound calls** using Twilio Voice API
-- 📱 **Send SMS messages** using Twilio Messaging API  
-- 📋 **Contact management** with SQLite database storage
-- 📊 **Call and message history** tracking
+- 📞 **Make outbound calls** using hybrid Twilio/MaxoTel routing
+- 📱 **Send SMS messages** via MaxoTel REST API  
+- 📋 **Full CRM** with contacts, companies, tasks, and notes
+- 📊 **Call and message history** from MaxoTel CDR
 - 🎯 **Webhook handlers** for incoming calls and SMS
 - 🎨 **Modern responsive UI** built with Next.js and Tailwind CSS
+- 💳 **Billing & Payments** with Stripe integration
+- 🔐 **Secure file sharing** with encryption
+- 📱 **Mobile app** support via Android SIP client
 
 ## Tech Stack
 
 - **Frontend**: Next.js 15 with React and TypeScript
 - **Styling**: Tailwind CSS with Lucide React icons
-- **Backend**: Next.js API routes
-- **Database**: SQLite with sqlite3
-- **Phone/SMS**: Twilio APIs
+- **Backend**: Next.js API routes (Hybrid MaxoTel)
+- **Database**: PostgreSQL (Railway hosted)
+- **Voice**: Twilio WebRTC → MaxoTel SIP Bridge
+- **SMS**: MaxoTel REST API
+- **Payments**: Stripe
 - **Environment**: Node.js
 
-## Setup Instructions
+## 🚀 Quick Start
 
 ### 1. Install Dependencies
 
@@ -40,22 +62,42 @@ This combination provides several advantages:
 npm install
 ```
 
-### 2. Configure Twilio
+### 2. Configure Services
 
-1. Create a [Twilio account](https://console.twilio.com) if you haven't already
-2. Get a Twilio phone number from the console
-3. Copy `.env.example` to `.env.local`:
+**Get MaxoTel Credentials:**
+1. Log in to [MaxoTel Portal](https://portal.maxo.com.au)
+2. Get your API key, Account ID, Virtual Mobile, and Office Number
 
+**Configure Twilio BYOC:**
+1. Create a [Twilio account](https://console.twilio.com)
+2. Go to Elastic SIP Trunking → Create new trunk
+3. Set Origination URI to `sip.maxo.com.au`
+4. Copy the Trunk SID
+
+**Environment Setup:**
 ```bash
 cp .env.example .env.local
 ```
 
-4. Fill in your Twilio credentials in `.env.local`:
+Edit `.env.local` with your credentials:
 
 ```env
+# Twilio (for WebRTC client)
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_auth_token_here
-TWILIO_PHONE_NUMBER=+1234567890
+TWILIO_API_KEY=SKxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_API_SECRET=your_api_secret
+TWILIO_TWIML_APP_SID=APxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_BYOC_TRUNK_SID=TKxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# MaxoTel (for calls & SMS)
+MAXOTEL_API_KEY=your_maxotel_api_key
+MAXOTEL_ACCOUNT_ID=your_account_id
+MAXOTEL_VIRTUAL_MOBILE=0400123456
+MAXOTEL_OFFICE_NUMBER=0299999999
+
+# Database
+DATABASE_URL=postgresql://localhost:5432/phone_crm
 ```
 
 ### 3. Run the Development Server
@@ -66,26 +108,29 @@ npm run dev
 
 The app will be available at [http://localhost:3000](http://localhost:3000)
 
-### 4. Configure Webhooks (Optional)
+### 4. Test the Integration
 
-For incoming calls and SMS, you'll need to expose your local development server to the internet. You can use tools like:
-
-- [ngrok](https://ngrok.com/)
-- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/)
-- [localtunnel](https://localtunnel.github.io/www/)
-
-Example with ngrok:
-
+**Health Check:**
 ```bash
-# Install ngrok and run
-ngrok http 3000
+curl http://localhost:3000/api/maxotel/health
 ```
 
-Then configure your Twilio phone number webhooks:
-- **Voice webhook URL**: `https://your-ngrok-url.ngrok.io/api/webhooks/calls`
-- **SMS webhook URL**: `https://your-ngrok-url.ngrok.io/api/webhooks/sms`
+Should return `"status": "ok"` if configured correctly.
+
+## 📚 Documentation
+
+- **[MAXOTEL_MIGRATION_GUIDE.md](./MAXOTEL_MIGRATION_GUIDE.md)** - Complete V2 architecture documentation
+- **[RAILWAY_ENV_SETUP.md](./RAILWAY_ENV_SETUP.md)** - Quick environment setup guide
+- **[V2_IMPLEMENTATION_SUMMARY.md](./V2_IMPLEMENTATION_SUMMARY.md)** - Implementation details
+- **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - Pre-deployment checklist
 
 ## API Endpoints
+
+### V2 MaxoTel Endpoints
+- `GET /api/maxotel/health` - Configuration health check
+- `POST /api/twiml/call` - Generate TwiML for MaxoTel SIP bridge
+- `POST /api/sms/send` - Send SMS via MaxoTel
+- `GET /api/calls/history` - Fetch call logs from MaxoTel CDR
 
 ### Contacts
 - `GET /api/contacts` - List all contacts

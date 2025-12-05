@@ -1,6 +1,7 @@
 'use client';
 
 import { Settings as SettingsIcon, User, Bell, Shield, Phone, Palette, Globe, Database, Key } from 'lucide-react';
+import PageHeader from '@/components/ui/PageHeader';
 
 interface SettingsPageProps {
   currentUser?: {
@@ -141,13 +142,18 @@ export default function SettingsPage({ currentUser, onSaveSettings }: SettingsPa
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-        <p className="text-gray-600">Manage your account and application preferences</p>
-      </div>
+    <div>
+      {/* Page Header */}
+      <PageHeader
+        title="Settings"
+        subtitle="Manage your account and application preferences"
+        breadcrumbs={[
+          { label: 'Phone System' },
+          { label: 'Settings' }
+        ]}
+      />
 
-      <div className="space-y-6">
+      <div className="space-y-6 mt-6">
         {settingsCategories.map((category) => (
           <div key={category.id} className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 py-5 border-b border-gray-100">
@@ -177,10 +183,9 @@ export default function SettingsPage({ currentUser, onSaveSettings }: SettingsPa
             </div>
           </div>
         ))}
-      </div>
 
-      {/* Danger Zone */}
-      <div className="bg-white rounded-2xl shadow-sm border border-red-200">
+        {/* Danger Zone */}
+        <div className="bg-white rounded-2xl shadow-sm border border-red-200">
         <div className="px-6 py-5 border-b border-red-100">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mr-4">
@@ -214,6 +219,7 @@ export default function SettingsPage({ currentUser, onSaveSettings }: SettingsPa
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

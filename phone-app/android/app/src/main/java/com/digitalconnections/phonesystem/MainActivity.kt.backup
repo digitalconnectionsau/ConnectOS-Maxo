@@ -1,0 +1,159 @@
+package com.digitalconnections.phonesystem
+
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import com.digitalconnections.phonesystem.databinding.ActivityMainBinding
+import com.digitalconnections.phonesystem.viewmodel.DialerViewModel
+
+class MainActivity : AppCompatActivity() {
+    
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: DialerViewModel
+    
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.all { it.value }
+        if (allGranted) {
+            initializeVoiceService()
+        } else {
+            Toast.makeText(this, "Permissions required for voice calling", Toast.LENGTH_LONG).show()
+        }
+    }
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        viewModel = ViewModelProvider(this)[DialerViewModel::class.java]
+        
+        setupToolbar()
+        setupDialer()
+        setupObservers()
+        checkPermissions()
+    }
+    
+    private fun setupToolbar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = "Phone System"
+    }
+    
+    private fun setupDialer() {
+        // Number pad buttons
+        val numberButtons = listOf(
+            binding.btn0, binding.btn1, binding.btn2, binding.btn3,
+            binding.btn4, binding.btn5, binding.btn6, binding.btn7,
+            binding.btn8, binding.btn9, binding.btnStar, binding.btnHash
+        )
+        
+        val numberValues = listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "#")
+        
+        numberButtons.forEachIndexed { index, button ->
+            button.setOnClickListener {
+                viewModel.addDigit(numberValues[index])
+            }
+        }
+        
+        // Action buttons
+        binding.btnCall.setOnClickListener {
+            val number = binding.etPhoneNumber.text.toString()
+            if (number.isNotEmpty()) {
+                makeCall(number)
+            } else {
+                Toast.makeText(this, "Please enter a phone number", Toast.LENGTH_SHORT).show()
+            }
+        }
+        
+        binding.btnDelete.setOnClickListener {
+            viewModel.deleteDigit()
+        }
+        
+        binding.btnDelete.setOnLongClickListener {
+            viewModel.clearNumber()
+            true
+        }
+    }
+    
+    private fun setupObservers() {
+        viewModel.phoneNumber.observe(this) { number ->
+            binding.etPhoneNumber.setText(number)
+            binding.etPhoneNumber.setSelection(number.length)
+        }
+        
+        viewModel.connectionStatus.observe(this) { status ->
+            updateConnectionStatus(status)
+        }
+    }
+    
+    private fun checkPermissions() {
+        val requiredPermissions = arrayOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CALL_PHONE,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS
+        )
+        
+        val missingPermissions = requiredPermissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+        
+        if (missingPermissions.isNotEmpty()) {
+            requestPermissionLauncher.launch(missingPermissions.toTypedArray())
+        } else {
+            initializeVoiceService()
+        }
+    }
+    
+    private fun initializeVoiceService() {
+        viewModel.initializeVoiceService(this)
+    }
+    
+    private fun makeCall(number: String) {
+        val intent = Intent(this, CallActivity::class.java).apply {
+            putExtra("PHONE_NUMBER", number)
+        }
+        startActivity(intent)
+    }
+    
+    private fun updateConnectionStatus(status: String) {
+        binding.tvConnectionStatus.text = status
+        
+        // Update status color
+        val color = when (status.lowercase()) {
+            "connected" -> ContextCompat.getColor(this, android.R.color.holo_green_dark)
+            "connecting" -> ContextCompat.getColor(this, android.R.color.holo_orange_dark)
+            "disconnected" -> ContextCompat.getColor(this, android.R.color.holo_red_dark)
+            else -> ContextCompat.getColor(this, android.R.color.darker_gray)
+        }
+        binding.tvConnectionStatus.setTextColor(color)
+    }
+    
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+    
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            R.id.action_refresh -> {
+                viewModel.refreshConnection()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+}

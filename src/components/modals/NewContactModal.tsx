@@ -10,6 +10,7 @@ interface NewContactModalProps {
     phone: string;
     email: string;
     jobTitle: string;
+    company: string;
     notes: string;
   }) => Promise<void>;
   loading: boolean;
@@ -17,7 +18,9 @@ interface NewContactModalProps {
 
 export default function NewContactModal({ isOpen, onClose, onSubmit, loading }: NewContactModalProps) {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
     phone: '',
     email: '',
     jobTitle: '',
@@ -28,8 +31,29 @@ export default function NewContactModal({ isOpen, onClose, onSubmit, loading }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
-    setFormData({ name: '', phone: '', email: '', jobTitle: '', notes: '' });
+    
+    // Combine name fields into a single name
+    const fullName = [formData.firstName, formData.middleName, formData.lastName]
+      .filter(name => name.trim().length > 0)
+      .join(' ');
+    
+    await onSubmit({
+      name: fullName,
+      phone: formData.phone,
+      email: formData.email,
+      jobTitle: formData.jobTitle,
+      notes: formData.notes
+    });
+    
+    setFormData({ 
+      firstName: '', 
+      middleName: '', 
+      lastName: '', 
+      phone: '', 
+      email: '', 
+      jobTitle: '', 
+      notes: '' 
+    });
   };
 
   return (
@@ -37,14 +61,31 @@ export default function NewContactModal({ isOpen, onClose, onSubmit, loading }: 
       <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
         <h3 className="text-xl font-semibold mb-6 text-gray-900">Add New Contact</h3>
         <form onSubmit={handleSubmit} className="space-y-5">
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-            value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
-            required
-          />
+          <div className="grid grid-cols-1 gap-4">
+            <input
+              type="text"
+              placeholder="First Name"
+              className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              value={formData.firstName}
+              onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Middle Names (optional)"
+              className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              value={formData.middleName}
+              onChange={(e) => setFormData({...formData, middleName: e.target.value})}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              value={formData.lastName}
+              onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+              required
+            />
+          </div>
           <input
             type="tel"
             placeholder="Phone Number"

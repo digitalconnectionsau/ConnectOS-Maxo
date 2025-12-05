@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Phone System</string>
+    <string name="settings_title">Settings</string>
+    <string name="call_title">Call</string>
+    
+    <!-- Menu items -->
+    <string name="action_settings">Settings</string>
+    <string name="action_refresh">Refresh</string>
+    
+    <!-- Provider types -->
+    <string name="provider_twilio">Twilio</string>
+    <string name="provider_maxotel">MaxoTel PBX</string>
+    
+    <!-- Settings -->
+    <string name="settings_provider">Voice Provider</string>
+    <string name="settings_twilio">Twilio Settings</string>
+    <string name="settings_maxotel">MaxoTel Settings</string>
+    <string name="settings_general">General Settings</string>
+    
+    <!-- Twilio settings -->
+    <string name="twilio_account_sid">Account SID</string>
+    <string name="twilio_api_key">API Key</string>
+    <string name="twilio_api_secret">API Secret</string>
+    <string name="twilio_from_number">From Number</string>
+    
+    <!-- MaxoTel settings -->
+    <string name="maxotel_server">Server Address</string>
+    <string name="maxotel_port">Port</string>
+    <string name="maxotel_username">Username</string>
+    <string name="maxotel_password">Password</string>
+    <string name="maxotel_extension">Extension</string>
+    
+    <!-- General settings -->
+    <string name="auto_answer">Auto Answer</string>
+    <string name="speaker_default">Speaker by Default</string>
+    <string name="notifications">Enable Notifications</string>
+    
+    <!-- Buttons -->
+    <string name="save">Save</string>
+    <string name="test_connection">Test Connection</string>
+    <string name="call">Call</string>
+    <string name="hangup">Hang Up</string>
+    <string name="mute">Mute</string>
+    <string name="unmute">Unmute</string>
+    <string name="speaker">Speaker</string>
+    <string name="hold">Hold</string>
+    <string name="keypad">Keypad</string>
+    
+    <!-- Call status -->
+    <string name="calling">Calling...</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="on_hold">On Hold</string>
+    
+    <!-- Permissions -->
+    <string name="permission_audio_title">Audio Permission Required</string>
+    <string name="permission_audio_message">This app needs audio permission to make calls</string>
+    <string name="permission_phone_title">Phone Permission Required</string>
+    <string name="permission_phone_message">This app needs phone permission to make calls</string>
+    
+    <!-- Additional strings -->
+    <string name="settings">Settings</string>
+    <string name="voice_provider">Voice Provider</string>
+    <string name="twilio">Twilio</string>
+    <string name="maxotel_pbx">MaxoTel PBX</string>
+    <string name="twilio_settings">Twilio Settings</string>
+    <string name="maxotel_settings">MaxoTel Settings</string>
+    <string name="account_sid">Account SID</string>
+    <string name="auth_token">Auth Token</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="server_address">Server Address</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="extension">Extension</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="connecting">Connecting...</string>
+    <string name="connection_failed">Connection Failed</string>
+    <string name="invalid_number">Invalid phone number</string>
+    <string name="enter_phone_number">Enter phone number</string>
+    <string name="hang_up">Hang Up</string>
+</resources>
