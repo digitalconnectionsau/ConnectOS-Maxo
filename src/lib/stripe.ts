@@ -53,6 +53,10 @@ export async function createOrGetStripeCustomer(
     return existingCustomer.rows[0].stripe_customer_id;
   }
   
+  if (!stripe) {
+    throw new Error('Stripe is not configured');
+  }
+  
   // Create new Stripe customer
   const customer = await stripe.customers.create({
     email,
