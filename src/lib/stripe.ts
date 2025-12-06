@@ -1,13 +1,16 @@
 import Stripe from 'stripe';
 
 // Initialize Stripe with your secret key
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
-});
+// Allow undefined during build time, will fail at runtime if actually used without key
+export const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-10-29.clover',
+    })
+  : null;
 
 // Stripe configuration
 export const STRIPE_CONFIG = {
-  publicKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+  publicKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
   currency: 'usd',
   minimumTopUpAmount: 500, // $5.00 in cents
   maximumTopUpAmount: 50000, // $500.00 in cents

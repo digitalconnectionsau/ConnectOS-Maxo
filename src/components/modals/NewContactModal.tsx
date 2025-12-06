@@ -24,6 +24,7 @@ export default function NewContactModal({ isOpen, onClose, onSubmit, loading }: 
     phone: '',
     email: '',
     jobTitle: '',
+    company: '',
     notes: ''
   });
 
@@ -53,6 +54,7 @@ export default function NewContactModal({ isOpen, onClose, onSubmit, loading }: 
       phone: '', 
       email: '', 
       jobTitle: '', 
+      company: '',
       notes: '' 
     });
   };

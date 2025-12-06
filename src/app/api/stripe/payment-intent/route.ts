@@ -10,6 +10,13 @@ export async function POST(request: NextRequest) {
     const userEmail = 'user@example.com'; // Replace with actual user email
     const userName = 'Test User'; // Replace with actual user name
     
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Stripe is not configured' },
+        { status: 500 }
+      );
+    }
+    
     if (!amount || amount < 500 || amount > 50000) {
       return NextResponse.json(
         { error: 'Invalid amount. Must be between $5.00 and $500.00' },
