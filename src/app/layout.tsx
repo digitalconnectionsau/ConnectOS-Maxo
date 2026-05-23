@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Phone CRM System",
-  description: "Complete phone and contact management system",
+  title: "ClientHub",
+  description: "CRM, ticketing, time tracking and billing — all in one place",
 };
 
 export default function RootLayout({

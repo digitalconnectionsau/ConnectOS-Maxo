@@ -1,6 +1,7 @@
 'use client';
 
-import { Users, Phone, Mail, Plus, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Users, Phone, Mail, Plus, MoreHorizontal, Edit, Trash2, Loader2 } from 'lucide-react';
 import DataTable, { TableColumn } from '@/components/ui/DataTable';
 import PageHeader from '@/components/ui/PageHeader';
 import { Avatar, StatusBadge, formatDate, formatPhoneNumber } from '@/components/ui/TableComponents';
@@ -17,11 +18,70 @@ interface Contact {
   last_contact: string;
   status: 'active' | 'inactive' | 'blocked';
   created_at: string;
+  sync_to_quickbooks?: boolean;
+  quickbooks_id?: string | null;
 }
 
 interface ContactsPageProps {
   contacts: Contact[];
   onNewContact: () => void;
+}
+
+/**
+ * Per-contact QuickBooks sync toggle.
+ *   ON  → contact is treated as a Customer; pushed to QBO if not already there.
+ *   OFF → contact is a lead / no longer synced.
+ * Manages its own optimistic state; falls back if the API rejects.
+ */
+function QuickBooksSyncToggle({ contact }: { contact: Contact }) {
+  const [enabled, setEnabled] = useState<boolean>(!!contact.sync_to_quickbooks);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleToggle = async () => {
+    const next = !enabled;
+    setBusy(true);
+    setError(null);
+    setEnabled(next); // optimistic
+    try {
+      const res = await fetch(`/api/contacts/${contact.id}/quickbooks`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sync: next }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.ok === false) {
+        throw new Error(data.error || 'Failed to update sync');
+      }
+    } catch (err) {
+      setEnabled(!next); // rollback
+      setError(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={handleToggle}
+        disabled={busy}
+        title={enabled ? 'Synced with QuickBooks' : 'Not synced'}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${
+          enabled ? 'bg-teal-500' : 'bg-gray-200'
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            enabled ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+      {busy && <Loader2 className="h-3.5 w-3.5 text-gray-400 animate-spin" />}
+      {error && <span className="text-xs text-red-600" title={error}>!</span>}
+    </div>
+  );
 }
 
 export default function ContactsPage({ contacts, onNewContact }: ContactsPageProps) {
@@ -108,6 +168,14 @@ export default function ContactsPage({ contacts, onNewContact }: ContactsPagePro
       sortable: true,
       render: (value: string) => (
         <span className="text-sm text-gray-500">{formatDate(value)}</span>
+      )
+    },
+    {
+      key: 'sync_to_quickbooks',
+      label: 'QuickBooks',
+      sortable: true,
+      render: (_value: boolean, contact: Contact) => (
+        <QuickBooksSyncToggle contact={contact} />
       )
     },
     {

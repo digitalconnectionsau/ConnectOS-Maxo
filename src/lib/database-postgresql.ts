@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { runMigrations } from './migrate';
 
 let pool: Pool | null = null;
 
@@ -53,6 +54,7 @@ export async function getDatabase() {
         CREATE INDEX IF NOT EXISTS idx_calls_contact_id ON calls(contact_id);
         CREATE INDEX IF NOT EXISTS idx_messages_contact_id ON messages(contact_id);
       `);
+      await runMigrations(client);
       console.log('PostgreSQL database initialized successfully');
     } finally {
       client.release();

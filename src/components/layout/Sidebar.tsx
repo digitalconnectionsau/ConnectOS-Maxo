@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Building2, Users, Phone, MessageSquare, Menu, X, Mail, Printer, FolderOpen, Settings, UserCircle } from 'lucide-react';
+import { Building2, Users, Phone, MessageSquare, Menu, X, Mail, Printer, FolderOpen, Settings, UserCircle, Ticket, Package, Briefcase, Clock, Receipt, KeyRound, BookOpen } from 'lucide-react';
 
 interface SidebarProps {
   contactsCount?: number;
@@ -12,6 +12,7 @@ interface SidebarProps {
   emailsCount?: number;
   faxCount?: number;
   fileTransferCount?: number;
+  ticketsCount?: number;
 }
 
 export default function Sidebar({ 
@@ -20,7 +21,8 @@ export default function Sidebar({
   messagesCount = 0,
   emailsCount = 0,
   faxCount = 0,
-  fileTransferCount = 0
+  fileTransferCount = 0,
+  ticketsCount = 0,
 }: SidebarProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const pathname = usePathname();
@@ -39,6 +41,55 @@ export default function Sidebar({
       icon: Users,
       count: contactsCount,
       path: '/contacts'
+    },
+    {
+      id: 'tickets',
+      label: 'Tickets',
+      icon: Ticket,
+      count: ticketsCount,
+      path: '/tickets'
+    },
+    {
+      id: 'products',
+      label: 'Products',
+      icon: Package,
+      count: null,
+      path: '/products'
+    },
+    {
+      id: 'invoices',
+      label: 'Invoices',
+      icon: Receipt,
+      count: null,
+      path: '/invoices'
+    },
+    {
+      id: 'projects',
+      label: 'Projects',
+      icon: Briefcase,
+      count: null,
+      path: '/projects'
+    },
+    {
+      id: 'time-tracking',
+      label: 'Time Tracking',
+      icon: Clock,
+      count: null,
+      path: '/time-tracking'
+    },
+    {
+      id: 'kb',
+      label: 'Knowledge Base',
+      icon: BookOpen,
+      count: null,
+      path: '/kb'
+    },
+    {
+      id: 'vault',
+      label: 'Password Vault',
+      icon: KeyRound,
+      count: null,
+      path: '/vault'
     },
     {
       id: 'calling',

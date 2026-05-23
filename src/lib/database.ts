@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { runMigrations } from './migrate';
 
 let pool: Pool | null = null;
 
@@ -329,6 +330,7 @@ export async function getDatabase() {
       `);
       
       console.log('PostgreSQL database initialized successfully with full CRM + payments schema');
+      await runMigrations(client);
     } catch (error) {
       console.error('Database initialization error:', error);
       throw error;

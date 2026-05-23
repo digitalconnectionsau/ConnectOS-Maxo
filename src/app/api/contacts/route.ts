@@ -6,14 +6,15 @@ export async function GET() {
     const db = await getDatabase();
     
     const result = await db.query(`
-      SELECT c.*, 
+      SELECT c.id, c.name, c.phone, c.email, c.job_title, c.company_id, c.company_name,
+             c.lead_status, c.sync_to_quickbooks, c.quickbooks_id, c.created_at,
         COUNT(DISTINCT calls.id) as call_count,
         COUNT(DISTINCT messages.id) as message_count,
         GREATEST(MAX(calls.created_at), MAX(messages.created_at)) as last_contact
       FROM contacts c
       LEFT JOIN calls ON c.id = calls.contact_id
       LEFT JOIN messages ON c.id = messages.contact_id
-      GROUP BY c.id, c.name, c.phone, c.email, c.job_title, c.company_id, c.created_at
+      GROUP BY c.id
       ORDER BY last_contact DESC NULLS LAST, c.created_at DESC
     `);
 

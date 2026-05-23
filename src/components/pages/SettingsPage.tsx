@@ -1,6 +1,7 @@
 'use client';
 
-import { Settings as SettingsIcon, User, Bell, Shield, Phone, Palette, Globe, Database, Key } from 'lucide-react';
+import Link from 'next/link';
+import { Settings as SettingsIcon, User, Bell, Shield, Phone, Palette, Globe, Database, Key, ChevronRight, Ticket } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 
 interface SettingsPageProps {
@@ -154,6 +155,54 @@ export default function SettingsPage({ currentUser, onSaveSettings }: SettingsPa
       />
 
       <div className="space-y-6 mt-6">
+        {/* Quick links to functional settings pages */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="px-6 py-5 border-b border-gray-100">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center mr-4">
+                <Globe className="h-5 w-5 text-teal-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Integrations</h3>
+                <p className="text-sm text-gray-600">Connect QuickBooks and other services</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <Link
+              href="/settings/integrations"
+              className="inline-flex items-center bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              Manage integrations
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Ticket settings quick link */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="px-6 py-5 border-b border-gray-100">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center mr-4">
+                <Ticket className="h-5 w-5 text-teal-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Ticket Settings</h3>
+                <p className="text-sm text-gray-600">Manage statuses, priorities and SLA policies</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <Link
+              href="/settings/tickets"
+              className="inline-flex items-center bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              Manage ticket settings
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
+          </div>
+        </div>
+
         {settingsCategories.map((category) => (
           <div key={category.id} className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 py-5 border-b border-gray-100">
