@@ -17,6 +17,17 @@ UPDATE contacts SET sync_to_quickbooks = TRUE WHERE quickbooks_id IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_contacts_sync_to_qbo ON contacts(sync_to_quickbooks);
 
+-- Ensure active column exists if products was pre-created by inline schema without it.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS sku VARCHAR(100);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS unit_price NUMERIC(12,2);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS taxable BOOLEAN;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS quickbooks_id VARCHAR(50);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS quickbooks_sync_token VARCHAR(20);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS income_account_ref VARCHAR(50);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS last_synced_at TIMESTAMP;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 -- Products / services. Mirrors QBO "Item" entities.
 CREATE TABLE IF NOT EXISTS products (
   id SERIAL PRIMARY KEY,
