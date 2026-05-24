@@ -196,12 +196,21 @@ export async function getDatabase() {
         CREATE TABLE IF NOT EXISTS products (
           id SERIAL PRIMARY KEY,
           name VARCHAR(255) NOT NULL,
+          sku VARCHAR(100),
           description TEXT,
-          price DECIMAL(10,2) NOT NULL,
+          price DECIMAL(10,2),
+          unit_price NUMERIC(12,2),
           currency VARCHAR(3) DEFAULT 'AUD',
           product_type VARCHAR(50), -- 'service', 'product', 'subscription'
+          active BOOLEAN NOT NULL DEFAULT TRUE,
+          taxable BOOLEAN,
+          quickbooks_id VARCHAR(50) UNIQUE,
+          quickbooks_sync_token VARCHAR(20),
+          income_account_ref VARCHAR(50),
+          last_synced_at TIMESTAMP,
           stripe_price_id VARCHAR(255), -- For Stripe integration
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         -- Invoices
